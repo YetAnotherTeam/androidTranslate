@@ -2,14 +2,12 @@ package ru.bondar.russify;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
@@ -18,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
-import retrofit.http.GET;
-import retrofit.http.Query;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -29,12 +25,8 @@ public class MainActivity extends Activity {
 
     private EditText mTextInput;
     private TextView mTextOutput;
-    private Handler handler;
-    private final int DELAY_TIME = 600;
-    private final int NEW_TEXT_VIEW_TEXT = 1;
+    private final int DELAY_TIME = 400;
     private final String ACCESS_KEY = "trnsl.1.1.20150911T085342Z.79f8b7b676e2face.b1fca036ecb27cb8260a55bf9704ff61a0e006b9";
-    private final String YANDEX_TRANSLATE_URL = "https://translate.yandex.net/api/v1.5/tr.json/translate?";
-    private final String YANDEX_DETECT_URL = "https://translate.yandex.net/api/v1.5/tr.json/detect?";
     private final String SERVICE_ENDPOINT = "https://translate.yandex.net";
 
     @Override
@@ -60,12 +52,11 @@ public class MainActivity extends Activity {
         RxTextView.textChangeEvents(mTextInput)
                 .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> service.getTranslate(ACCESS_KEY, s.text().toString(), "en-ru")
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(new Subscriber<JsonObject>() {
+                .subscribe(s -> service.detectLanguage(ACCESS_KEY, s.text().toString())
+                                .subscribe(new Subscriber<JsonObject>() {
                                     @Override
                                     public void onCompleted() {
+
                                     }
 
                                     @Override
@@ -75,12 +66,57 @@ public class MainActivity extends Activity {
 
                                     @Override
                                     public void onNext(JsonObject jsonObject) {
-                                        Log.d("onNext", jsonObject.toString());
-                                        mTextOutput.setText(jsonObject.get("text")
-                                                .getAsJsonArray().get(0).toString().replace("\"", "")); //???
+                                        String direction;
+                                        if (jsonObject.get("lang").getAsString().equals("ru")) {
+                                            direction = "ru-en";
+                                        } else {
+                                            direction = jsonObject.get("lang").getAsString() + "-ru";
+                                        }
+                                        service.getTranslate(ACCESS_KEY, s.text().toString(), direction)
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribeOn(Schedulers.io())
+                                                .subscribe(new Subscriber<JsonObject>() {
+                                                    @Override
+                                                    public void onCompleted() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    @Override
+                                                    public void onNext(JsonObject jsonObject) {
+                                                        mTextOutput.setText(jsonObject.get("text")
+                                                                .getAsJsonArray().get(0)
+                                                                .getAsString());
+                                                    }
+                                                });
                                     }
                                 })
                 );
+//                .subscribe(s -> service.getTranslate(ACCESS_KEY, s.text().toString(), "en-ru")
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeOn(Schedulers.io())
+//                    .subscribe(new Subscriber<JsonObject>() {
+//                        @Override
+//                        public void onCompleted() {
+//                        }
+//
+//                        @Override
+//                        public void onError(Throwable e) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onNext(JsonObject jsonObject) {
+//                            Log.d("onNext", jsonObject.toString());
+//                            mTextOutput.setText(jsonObject.get("text")
+//                                    .getAsJsonArray().get(0).getAsString(); //???
+//                        }
+//                    })
+//                );
     }
 
     @Override

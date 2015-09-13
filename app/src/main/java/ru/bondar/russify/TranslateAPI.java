@@ -12,4 +12,9 @@ public interface TranslateAPI {
     Observable<JsonObject> getTranslate(@Query("key") String key
             , @Query("text") String text
             , @Query("lang") String lang);
+
+    @GET("/api/v1.5/tr.json/detect")
+    Observable<JsonObject> detectLanguage(@Query("key") String key,
+                                          @Query("text") String text
+                                        );
 }
