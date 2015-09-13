@@ -18,7 +18,7 @@
         android:layout_gravity="center_horizontal"
         android:hint="@string/input_text_here"
         android:elevation="10dp"
-        android:translationZ="7dp" />
+         />
 
     <TextView
         android:layout_marginTop="7dp"
@@ -28,7 +28,6 @@
         android:minHeight="125dp"
         android:hint="@string/output_hint"
         android:id="@+id/text_output"
-        android:textColor="@color/text_primary"
         android:textIsSelectable="true"
         android:layout_gravity="center_horizontal" />
 

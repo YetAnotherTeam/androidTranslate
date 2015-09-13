@@ -1,21 +1,29 @@
 package ru.bondar.russify;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.jakewharton.rxbinding.widget.RxTextView;
 
-import ru.bondar.russify.util.RequestTask;
+import java.util.concurrent.TimeUnit;
+
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
+import retrofit.http.GET;
+import retrofit.http.Query;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends Activity {
 
@@ -27,6 +35,7 @@ public class MainActivity extends Activity {
     private final String ACCESS_KEY = "trnsl.1.1.20150911T085342Z.79f8b7b676e2face.b1fca036ecb27cb8260a55bf9704ff61a0e006b9";
     private final String YANDEX_TRANSLATE_URL = "https://translate.yandex.net/api/v1.5/tr.json/translate?";
     private final String YANDEX_DETECT_URL = "https://translate.yandex.net/api/v1.5/tr.json/detect?";
+    private final String SERVICE_ENDPOINT = "https://translate.yandex.net";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,128 +45,42 @@ public class MainActivity extends Activity {
         mTextInput = (EditText) findViewById(R.id.text_input);
         mTextOutput = (TextView) findViewById(R.id.text_output);
 
-        handler = new Handler() {
-            public void handleMessage(Message msg) {
-                final int what = msg.what;
-                switch (what) {
-                    case NEW_TEXT_VIEW_TEXT: {
-                        String messageText = (String) msg.obj;
-                        TranslatorTask translatorTask = new TranslatorTask();
-                        translatorTask.execute(messageText);
-                        Log.d("NEW TASK", "task gone to execute");
-                        try {
-                            String translatedText = translatorTask.get();
-                            Log.d("NEW TASK", translatedText);
-                            updateTextView(translatedText);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SERVICE_ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+        Log.d("here", "here");
+        TranslateAPI service = retrofit.create(TranslateAPI.class);
+        Log.d("here", "here1");
+        Observable<JsonObject> observable = service.getTranslate(ACCESS_KEY, "hello", "en-ru");
 
-//                        JsonObject result = api.getTranslate(ACCESS_KEY, "Hello", "en-ru");
-//                        Log.d("RESULT!", result.toString());
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-            }
-        };
 
-        TextWatcher inputTW = new TextWatcher() {
+        Log.d("here", "here3");
+        RxTextView.textChangeEvents(mTextInput)
+                .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> service.getTranslate(ACCESS_KEY, s.text().toString(), "en-ru")
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Subscriber<JsonObject>() {
+                                    @Override
+                                    public void onCompleted() {
+                                    }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                    @Override
+                                    public void onError(Throwable e) {
 
-            }
+                                    }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            Runnable translateTask = new Runnable() {
-                @Override
-                public void run() {
-                    final String result = mTextInput.getText().toString();
-                    Message msg = Message.obtain();
-                    msg.obj = result;
-                    msg.what = NEW_TEXT_VIEW_TEXT;
-                    handler.sendMessage(msg);
-                }
-            };
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                handler.removeCallbacks(translateTask);
-                handler.postDelayed(translateTask, DELAY_TIME);
-            }
-        };
-
-        mTextInput.addTextChangedListener(inputTW);
-    }
-
-    private class TranslatorTask extends AsyncTask<String, Void, String>{
-
-        @Override
-        protected String doInBackground(String... msgTexts) {
-            String translateResult = "";
-            for (String msgText : msgTexts) {
-                msgText = msgText.trim().replace(" ", "+");
-                Log.d("NEW TASK", "getting direction");
-                String translateDirection = getTranslateDirection(msgText);
-                Log.d("NEW TASK", "getting translate");
-                translateResult = translate(msgText, translateDirection);
-            }
-            return translateResult;
-        }
-    }
-
-    private void updateTextView(String s) {
-        mTextOutput.setText(s);
-    }
-
-    private String getTranslateDirection(String text) {
-        String urlForDetection = YANDEX_DETECT_URL + "key=" + ACCESS_KEY + "&text=" + text;
-        RequestTask detectRequest = new RequestTask();
-        detectRequest.execute(urlForDetection);
-        String translateDirection;
-        String detectionResult;
-        try {
-            Log.d("NEW TASK", "before detecting");
-            detectionResult = detectRequest.get();
-            Log.d("NEW TASK", "after dee");
-            JSONObject jsonObject = new JSONObject(detectionResult);
-            if (jsonObject.getString("lang").equals("ru")) {
-                translateDirection = "ru-en";
-            } else {
-                translateDirection = jsonObject.getString("lang") + "-ru";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            translateDirection = "en-ru";
-        }
-        return translateDirection;
-    }
-
-    private String translate(String text, String translateDirection) {
-        String urlForTranslate = YANDEX_TRANSLATE_URL + "key=" + ACCESS_KEY +
-                "&text=" + text + "&lang=" + translateDirection;
-        RequestTask rt = new RequestTask();
-        rt.execute(urlForTranslate);
-        String response;
-        JSONObject jsonResult;
-        String resultText;
-        try {
-            response = rt.get();
-            jsonResult = new JSONObject(response);
-            resultText = jsonResult.getJSONArray("text").get(0).toString();
-            Log.d("RESULT", response);
-        } catch (Exception e) {
-            resultText = "";
-            e.printStackTrace();
-        }
-        return resultText;
+                                    @Override
+                                    public void onNext(JsonObject jsonObject) {
+                                        Log.d("onNext", jsonObject.toString());
+                                        mTextOutput.setText(jsonObject.get("text")
+                                                .getAsJsonArray().get(0).toString().replace("\"", "")); //???
+                                    }
+                                })
+                );
     }
 
     @Override
