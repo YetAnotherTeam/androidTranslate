@@ -1,12 +1,16 @@
 package ru.bondar.russify;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -16,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -25,6 +28,7 @@ public class MainActivity extends Activity {
 
     private EditText mTextInput;
     private TextView mTextOutput;
+    private Button mCopyButton;
     private final int DELAY_TIME = 400;
     private final String ACCESS_KEY = "trnsl.1.1.20150911T085342Z.79f8b7b676e2face.b1fca036ecb27cb8260a55bf9704ff61a0e006b9";
     private final String SERVICE_ENDPOINT = "https://translate.yandex.net";
@@ -37,18 +41,23 @@ public class MainActivity extends Activity {
         mTextInput = (EditText) findViewById(R.id.text_input);
         mTextOutput = (TextView) findViewById(R.id.text_output);
 
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+
+        mTextOutput.setOnClickListener(v -> {
+            ClipData clipData = ClipData.newPlainText("Translation", mTextOutput.getText().toString());
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+        });
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(SERVICE_ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-        Log.d("here", "here");
+
         TranslateAPI service = retrofit.create(TranslateAPI.class);
-        Log.d("here", "here1");
-        Observable<JsonObject> observable = service.getTranslate(ACCESS_KEY, "hello", "en-ru");
 
 
-        Log.d("here", "here3");
         RxTextView.textChangeEvents(mTextInput)
                 .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -78,12 +87,12 @@ public class MainActivity extends Activity {
                                                 .subscribe(new Subscriber<JsonObject>() {
                                                     @Override
                                                     public void onCompleted() {
-
+                                                        
                                                     }
 
                                                     @Override
                                                     public void onError(Throwable e) {
-                                                        e.printStackTrace();
+                                                        mTextOutput.setText("");
                                                     }
 
                                                     @Override
@@ -96,27 +105,7 @@ public class MainActivity extends Activity {
                                     }
                                 })
                 );
-//                .subscribe(s -> service.getTranslate(ACCESS_KEY, s.text().toString(), "en-ru")
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(Schedulers.io())
-//                    .subscribe(new Subscriber<JsonObject>() {
-//                        @Override
-//                        public void onCompleted() {
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onNext(JsonObject jsonObject) {
-//                            Log.d("onNext", jsonObject.toString());
-//                            mTextOutput.setText(jsonObject.get("text")
-//                                    .getAsJsonArray().get(0).getAsString(); //???
-//                        }
-//                    })
-//                );
+
     }
 
     @Override
