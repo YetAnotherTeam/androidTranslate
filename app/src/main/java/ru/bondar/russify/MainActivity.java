@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
 
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
+
         mTextOutput.setOnClickListener(v -> {
             ClipData clipData = ClipData.newPlainText("Translation", mTextOutput.getText().toString());
             clipboardManager.setPrimaryClip(clipData);

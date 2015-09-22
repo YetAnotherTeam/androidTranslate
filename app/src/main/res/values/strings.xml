@@ -6,5 +6,8 @@
     <string name="input_text_here">Введите текст</string>
     <string name="output_hint">Text will output here</string>
     <string name="text_copied">Текст скопирован в буфер обмена</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--string name="yandex_promo"><a href="http://translate.yandex.ru/">Переведено сервисом «Яндекс.Перевод»</a></string-->
 </resources>
