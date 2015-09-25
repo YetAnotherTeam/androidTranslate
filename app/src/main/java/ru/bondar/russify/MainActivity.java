@@ -1,6 +1,5 @@
 package ru.bondar.russify;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
@@ -12,8 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
+import ru.bondar.russify.ApiInterface.TranslateAPI;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 
     private EditText mTextInput;
     private final int DELAY_TIME = 400;
-    private final String ACCESS_KEY = "trnsl.1.1.20150911T085342Z.79f8b7b676e2face.b1fca036ecb27cb8260a55bf9704ff61a0e006b9";
-    private final String SERVICE_ENDPOINT = "https://translate.yandex.net";
     private FragmentManager fManager;
 
     @Override
@@ -43,25 +41,11 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 
         mTextInput = (EditText) findViewById(R.id.text_input);
 
-        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-
         fManager = getFragmentManager();
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
-//        mTextOutput.setOnClickListener(v -> {
-//            ClipData clipData = ClipData.newPlainText("Translation", mTextOutput.getText().toString());
-//            clipboardManager.setPrimaryClip(clipData);
-//            Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
-//        });
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SERVICE_ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
-
-        TranslateAPI service = retrofit.create(TranslateAPI.class);
+        TranslateAdapter retrofit = TranslateAdapter.getInstance();
 
         TranslationFragment fragment = TranslationFragment
                 .newInstance("");
@@ -72,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
         fTrans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fTrans.commit();
 
-
         RxTextView.textChanges(mTextInput)
                 .filter(t -> {
                     Log.d("STRING", t.toString());
@@ -80,13 +63,13 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
                 })
                 .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
-                .subscribe(s -> service.detectLanguage(ACCESS_KEY, s.toString())
+                .subscribe(s -> retrofit.getDirection(s.toString())
                                 .flatMap(j -> {
                                     String result = j.get("lang").getAsString();
                                     if (result.equals("ru")) {
-                                        return service.getTranslate(ACCESS_KEY, s.toString(), "ru-en");
+                                        return retrofit.getTranslate(s.toString(), "ru-en");
                                     } else {
-                                        return service.getTranslate(ACCESS_KEY, s.toString(), result + "-ru");
+                                        return retrofit.getTranslate(s.toString(), result + "-ru");
                                     }
                                 })
                                 .observeOn(AndroidSchedulers.mainThread())

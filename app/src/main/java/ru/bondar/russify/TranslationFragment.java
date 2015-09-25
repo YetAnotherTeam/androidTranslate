@@ -1,13 +1,20 @@
 package ru.bondar.russify;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -27,6 +34,7 @@ public class TranslationFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private TextView mTextView;
+    private ImageButton mCopyButton;
 
     private OnFragmentInteractionListener mListener;
 
@@ -63,6 +71,14 @@ public class TranslationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         mTextView = (TextView) view.findViewById(R.id.fragment_text_output);
+        mCopyButton = (ImageButton) view.findViewById(R.id.button_copy);
+
+        ClipboardManager clipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        mCopyButton.setOnClickListener(v -> {
+            ClipData clipData = ClipData.newPlainText("Translation", mTextView.getText().toString());
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(getActivity(), "Текст скопирован", Toast.LENGTH_SHORT).show();
+        });
         return view;
     }
 
@@ -87,6 +103,10 @@ public class TranslationFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }
+
+//    public void setCopyButtonListner(View.OnClickListener l) {
+//        mCopyButton.setOnClickListener(l);
+//    }
 
     @Override
     public void onDetach() {

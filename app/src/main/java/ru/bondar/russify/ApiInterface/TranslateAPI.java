@@ -1,4 +1,4 @@
-package ru.bondar.russify;
+package ru.bondar.russify.ApiInterface;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,6 +15,5 @@ public interface TranslateAPI {
 
     @GET("/api/v1.5/tr.json/detect")
     Observable<JsonObject> detectLanguage(@Query("key") String key,
-                                          @Query("text") String text
-                                        );
+                                          @Query("text") String text);
 }
