@@ -3,5 +3,8 @@
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1E88E5</color>
     <color name="accent">#ff757575</color>
+    <!--<color name="accent">#7c1818</color>-->
     <color name="white">#fff</color>
+    <color name="textPrimary">#c2000000</color>
+    <color name="textSecondary">#ffffff</color>
 </resources>

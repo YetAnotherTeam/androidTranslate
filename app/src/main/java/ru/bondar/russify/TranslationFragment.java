@@ -104,10 +104,6 @@ public class TranslationFragment extends Fragment {
         }
     }
 
-//    public void setCopyButtonListner(View.OnClickListener l) {
-//        mCopyButton.setOnClickListener(l);
-//    }
-
     @Override
     public void onDetach() {
         super.onDetach();

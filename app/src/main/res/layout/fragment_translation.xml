@@ -13,8 +13,8 @@
         android:layout_height="125dp"
         android:text="@string/translation_here"
         android:textSize="18sp"
-        android:textColor="#fff"
         android:padding="16dp"
+        android:textColor="@color/textSecondary"
         />
 
     <ImageButton
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_content_copy_white_24dp"
-        android:background="@drawable/clickable_circle"
+        android:background="@drawable/ripple_square"
         android:layout_gravity="bottom|end"
         android:clickable="true"
         android:padding="8dp"

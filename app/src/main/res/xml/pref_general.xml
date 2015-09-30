@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<CheckBoxPreference-->
+        <!--android:title="@string/auto_translate_title"-->
+        <!--android:summary="@string/autotranslate_summary"-->
+        <!--android:key="@string/auto_translate_key"-->
+        <!--/>-->
+
+    <PreferenceCategory
+        android:title="@string/smart_translate_title">
+
+        <!--<CheckBoxPreference-->
+            <!--android:title="Умный перевод"-->
+
+            <!--/>-->
+
+        <ListPreference
+            android:title="@string/main_lang_list_title"
+            android:summary="@string/main_lang_summary"
+            android:key="@string/main_lang"
+            android:defaultValue="ru"
+            android:entries="@array/lang_list"
+            android:entryValues="@array/lang_list_values"
+            />
+
+        <ListPreference
+            android:title="@string/secondary_lang_list_title"
+            android:summary="@string/secondary_lang_summary"
+            android:key="@string/secondary_lang"
+            android:defaultValue="en"
+            android:entries="@array/lang_list"
+            android:entryValues="@array/lang_list_values"
+            />
+
+        <EditTextPreference
+            android:title="@string/delay_pref_title"
+            android:defaultValue="400"
+            android:key="@string/debounce_value"
+            android:summary="@string/delay_pref_summary"
+            android:inputType="number"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>
