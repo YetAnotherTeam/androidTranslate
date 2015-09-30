@@ -36,6 +36,7 @@
         <EditTextPreference
             android:title="@string/delay_pref_title"
             android:defaultValue="400"
+            android:hint=""
             android:key="@string/debounce_value"
             android:summary="@string/delay_pref_summary"
             android:inputType="number"

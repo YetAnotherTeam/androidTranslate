@@ -7,16 +7,19 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,8 +28,10 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity implements TranslationFragment.OnFragmentInteractionListener {
 
     private EditText mTextInput;
+    private ImageButton mSpeechButton;
     private int delayTime;
     private final int DEBOUNCE_TIME = 400;
+    private final int VOICE_RECOGNITION_REQUEST_CODE = 0;
     private FragmentManager fManager;
     private SharedPreferences sharedPreferences;
     private String mainLanguage;
@@ -44,6 +49,17 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 //        secondaryLanguage = sharedPreferences.getString(getString(R.string.secondary_lang), "en");
 
         mTextInput = (EditText) findViewById(R.id.text_input);
+        mSpeechButton = (ImageButton) findViewById(R.id.button_speech_to_text);
+
+        mSpeechButton.setOnClickListener(v -> {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, sharedPreferences.getString(getString(R.string.main_lang), "ru"));
+            try {
+                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         fManager = getFragmentManager();
 
@@ -126,4 +142,16 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
+            ArrayList<String> resultText = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (resultText != null && !resultText.isEmpty()) {
+                mTextInput.setText(resultText.get(0));
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 }
