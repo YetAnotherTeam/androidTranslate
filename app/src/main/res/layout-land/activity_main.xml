@@ -17,15 +17,14 @@
          android:layout_alignParentBottom="true"
          tools:layout="@layout/fragment_menu"/>
 
-     <!--<fragment-->
-         <!--android:layout_width="wrap_content"-->
-         <!--android:layout_height="wrap_content"-->
-         <!--android:name="ru.bondar.russify.fragments.TranslatorFragment"-->
-         <!--android:id="@+id/fragmentContent"-->
-         <!--android:layout_alignParentEnd="true"-->
-         <!--android:layout_alignWithParentIfMissing="false"-->
-         <!--android:layout_alignParentBottom="true"-->
-         <!--android:layout_alignParentTop="true"-->
-         <!--android:layout_toEndOf="@+id/fragmentMenu"-->
-         <!--tools:layout="@layout/fragment_translator" />-->
+     <FrameLayout
+         android:id="@+id/fragmentContent"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentEnd="true"
+         android:layout_alignWithParentIfMissing="false"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentTop="true"
+         android:layout_toEndOf="@+id/fragmentMenu"
+         tools:layout="@layout/fragment_translator"/>
  </RelativeLayout>

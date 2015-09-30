@@ -1,13 +1,18 @@
 package ru.bondar.russify;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,11 +25,19 @@ import java.util.concurrent.TimeUnit;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
+import ru.bondar.russify.fragments.HistoryFragment;
+import ru.bondar.russify.fragments.MenuFragment;
+import ru.bondar.russify.fragments.SettingsFragment;
+import ru.bondar.russify.fragments.TranslatorFragment;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements MenuFragment.OnFragmentInteractionListener,
+        TranslatorFragment.OnFragmentInteractionListener,
+        SettingsFragment.OnFragmentInteractionListener,
+        HistoryFragment.OnFragmentInteractionListener
+{
 
     private EditText mTextInput;
     private TextView mTextOutput;
@@ -38,9 +51,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            landScapeOrientationInit();
+            landScapeOrientationInit();
         } else {
-            portaitScapeOrientationInit();
+            portraitScapeOrientationInit();
         }
     }
 
@@ -67,11 +80,31 @@ public class MainActivity extends Activity {
     }
 
     private void landScapeOrientationInit() {
-        translatorMenuInit();
+        //translatorMenuInit();
 
+        FragmentManager fManager = getFragmentManager();
+        FragmentTransaction fTransaction = fManager.beginTransaction();
+        fTransaction
+                .replace(R.id.fragmentContent, new TranslatorFragment())
+                .addToBackStack(null)
+                .commit();
+
+        Button historyButton = (Button) findViewById(R.id.historyButton);
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                FragmentManager fManager = getFragmentManager();
+                HistoryFragment historyFragment = (HistoryFragment) new HistoryFragment();
+                FragmentTransaction fTransaction = fManager.beginTransaction();
+                fTransaction
+                        .replace(R.id.fragmentContent, historyFragment)
+                        .addToBackStack(null)
+                        .commit();
+
+            }
+        });
     }
 
-    private void portaitScapeOrientationInit() {
+    private void portraitScapeOrientationInit() {
         translatorMenuInit();
     }
 
@@ -89,9 +122,9 @@ public class MainActivity extends Activity {
         });
 
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(SERVICE_ENDPOINT)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .baseUrl(SERVICE_ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
             .build();
 
         TranslateAPI service = retrofit.create(TranslateAPI.class);
@@ -101,36 +134,41 @@ public class MainActivity extends Activity {
                 .filter(t -> {
                     Log.d("STRING", t.toString());
                     return t.length() != 0;
-            })
-            .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
-            .observeOn(Schedulers.io())
-            .subscribe(s -> service.detectLanguage(ACCESS_KEY, s.toString())
-                .flatMap(j -> {
-                    String result = j.get("lang").getAsString();
-                    if (result.equals("ru")) {
-                        return service.getTranslate(ACCESS_KEY, s.toString(), "ru-en");
-                    } else {
-                        return service.getTranslate(ACCESS_KEY, s.toString(), result + "-ru");
-                    }
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<JsonObject>() {
-                    @Override
-                    public void onCompleted() {
+                .debounce(DELAY_TIME, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribe(s -> service.detectLanguage(ACCESS_KEY, s.toString())
+                                .flatMap(j -> {
+                                    String result = j.get("lang").getAsString();
+                                    if (result.equals("ru")) {
+                                        return service.getTranslate(ACCESS_KEY, s.toString(), "ru-en");
+                                    } else {
+                                        return service.getTranslate(ACCESS_KEY, s.toString(), result + "-ru");
+                                    }
+                                })
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<JsonObject>() {
+                                    @Override
+                                    public void onCompleted() {
 
-                    }
+                                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        e.printStackTrace();
+                                    }
 
-                    @Override
-                    public void onNext(JsonObject jsonObject) {
-                        mTextOutput.setText(jsonObject.get("text")
-                                .getAsJsonArray().get(0).getAsString());
-                    }
-                })
+                                    @Override
+                                    public void onNext(JsonObject jsonObject) {
+                                        mTextOutput.setText(jsonObject.get("text")
+                                                .getAsJsonArray().get(0).getAsString());
+                                    }
+                                })
             );
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
