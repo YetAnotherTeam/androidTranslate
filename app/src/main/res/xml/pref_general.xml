@@ -18,7 +18,7 @@
         <ListPreference
             android:title="@string/main_lang_list_title"
             android:summary="@string/main_lang_summary"
-            android:key="@string/main_lang"
+            android:key="main_lang"
             android:defaultValue="ru"
             android:entries="@array/lang_list"
             android:entryValues="@array/lang_list_values"
@@ -27,7 +27,7 @@
         <ListPreference
             android:title="@string/secondary_lang_list_title"
             android:summary="@string/secondary_lang_summary"
-            android:key="@string/secondary_lang"
+            android:key="secondary_lang"
             android:defaultValue="en"
             android:entries="@array/lang_list"
             android:entryValues="@array/lang_list_values"
@@ -37,7 +37,7 @@
             android:title="@string/delay_pref_title"
             android:defaultValue="400"
             android:hint=""
-            android:key="@string/debounce_value"
+            android:key="debounce_value"
             android:summary="@string/delay_pref_summary"
             android:inputType="number"
             />

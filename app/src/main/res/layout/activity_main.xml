@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:id="@+id/text_input"
             android:layout_gravity="center_horizontal"
-            android:hint="@string/input_text_here"
+            android:hint="@string/input_text_hint"
             />
 
         <ImageButton
@@ -48,7 +48,7 @@
             android:layout_gravity="bottom|end"
             android:clickable="true"
             android:padding="8dp"
-            android:contentDescription="@string/copy_hint"
+            android:contentDescription="@string/speech_to_text_description"
             android:adjustViewBounds="false" />
 
     </android.support.v7.widget.CardView>
@@ -61,6 +61,6 @@
         android:paddingTop="8dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:id="@+id/trn_fragment_container"/>
+        android:id="@+id/translate_fragment_container"/>
 
 </LinearLayout>

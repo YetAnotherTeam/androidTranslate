@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
     private EditText mTextInput;
     private ImageButton mSpeechButton;
     private int delayTime;
-    private final int DEBOUNCE_TIME = 400;
     private final int VOICE_RECOGNITION_REQUEST_CODE = 0;
     private FragmentManager fManager;
     private SharedPreferences sharedPreferences;
@@ -39,14 +38,11 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);                                     //надо весь onCreate зарефакторить, но фиг знает как, мб butter knife поможет?
         setContentView(R.layout.activity_main);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        delayTime = Integer.valueOf(sharedPreferences.getString(getString(R.string.debounce_value), "400"));
-
-//        mainLanguage = sharedPreferences.getString(getString(R.string.main_lang), "ru");
-//        secondaryLanguage = sharedPreferences.getString(getString(R.string.secondary_lang), "en");
+        delayTime = Integer.valueOf(sharedPreferences.getString(getString(R.string.delay_value), "400")); // any way better to get int?
 
         mTextInput = (EditText) findViewById(R.id.text_input);
         mSpeechButton = (ImageButton) findViewById(R.id.button_speech_to_text);
@@ -61,24 +57,19 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
             }
         });
 
-        fManager = getFragmentManager();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(0xFFFFFFFF);
-
         setSupportActionBar(toolbar);
 
-        TranslateAdapter retrofit = TranslateAdapter.getInstance();
-
+        fManager = getFragmentManager();
         TranslationFragment fragment = TranslationFragment
                 .newInstance("");
-
         FragmentTransaction fTrans = fManager.beginTransaction();
-
-        fTrans.add(R.id.trn_fragment_container, fragment);
+        fTrans.add(R.id.translate_fragment_container, fragment);
         fTrans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fTrans.commit();
 
+        TranslateAdapter retrofit = TranslateAdapter.getInstance();
 
         RxTextView.textChanges(mTextInput)
                 .filter(t -> {

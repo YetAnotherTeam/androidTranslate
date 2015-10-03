@@ -2,28 +2,24 @@
     <string name="app_name">Russify</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="input_text_here">Введите текст</string>
-    <string name="output_hint">Text will output here</string>
-    <string name="text_copied">Текст скопирован в буфер обмена</string>
-
-<!-- TODO: Remove or change this placeholder text -->
+    <string name="action_settings">Настройки</string>
+    <string name="input_text_hint">Введите текст</string>
+    <string name="output_hint">Текст будет выведен здесь</string>
+    <string name="text_copied_toast">Текст скопирован в буфер обмена</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="translation_here">Перевод будет выведен здесь</string>
-    <string name="copy_hint">Copy content</string>
-    <string name="title_activity_preference">Settings</string>
-    <string name="main_lang">main_lang</string>
-    <string name="secondary_lang">secondary_lang</string>
+    <string name="translation_here_hint">Перевод будет выведен здесь</string>
+    <string name="copy_hint">Скопировать содержимое</string>
+    <string name="preference_title_activity">Settings</string>
     <string name="main_lang_list_title">Основной язык</string>
     <string name="main_lang_summary">Язык, на который будет выполнен перевод</string>
     <string name="secondary_lang_list_title">Второй язык</string>
     <string name="secondary_lang_summary">Язык перевода с основного</string>
     <string name="smart_translate_title">Умный перевод</string>
-    <string name="autotranslate_summary">Перевод до окончания ввода</string>
+    <string name="auto_translate_summary">Перевод до окончания ввода</string>
     <string name="auto_translate_title">Автоперевод</string>
     <string name="auto_translate_key">auto_translate</string>
     <string name="delay_pref_title">Задержка перевода</string>
-    <string name="debounce_value">debounce_value</string>
     <string name="delay_pref_summary">В миллисекундах</string>
+    <string name="speech_to_text_description">Голосовой набор текста</string>
     <!--string name="yandex_promo"><a href="http://translate.yandex.ru/">Переведено сервисом «Яндекс.Перевод»</a></string-->
 </resources>

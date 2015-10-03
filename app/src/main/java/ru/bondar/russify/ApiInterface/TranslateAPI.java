@@ -1,6 +1,5 @@
 package ru.bondar.russify.ApiInterface;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import retrofit.http.GET;
