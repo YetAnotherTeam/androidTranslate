@@ -21,5 +21,8 @@
     <string name="delay_pref_title">Задержка перевода</string>
     <string name="delay_pref_summary">В миллисекундах</string>
     <string name="speech_to_text_description">Голосовой набор текста</string>
+    <string name="secondary_lang">secondary_lang</string>
+    <string name="delay_value">debounce_value</string>
+    <string name="main_lang">main_lang</string>
     <!--string name="yandex_promo"><a href="http://translate.yandex.ru/">Переведено сервисом «Яндекс.Перевод»</a></string-->
 </resources>
