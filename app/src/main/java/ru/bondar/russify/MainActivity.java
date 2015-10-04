@@ -38,44 +38,22 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);                                     //надо весь onCreate зарефакторить, но фиг знает как, мб butter knife поможет?
+        super.onCreate(savedInstanceState);                                     //может стоит зарефакторить как-то, а то очень много всего в onCreate
         setContentView(R.layout.activity_main);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         delayTime = Integer.valueOf(sharedPreferences.getString(getString(R.string.delay_value), "400")); // any way better to get int?
 
-        mTextInput = (EditText) findViewById(R.id.text_input);
-        mSpeechButton = (ImageButton) findViewById(R.id.button_speech_to_text);
-
-        mSpeechButton.setOnClickListener(v -> {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, sharedPreferences.getString(getString(R.string.main_lang), "ru"));
-            try {
-                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(0xFFFFFFFF);
-        setSupportActionBar(toolbar);
-
-        fManager = getFragmentManager();
-        TranslationFragment fragment = TranslationFragment
-                .newInstance("");
-        FragmentTransaction fTrans = fManager.beginTransaction();
-        fTrans.add(R.id.translate_fragment_container, fragment);
-        fTrans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        fTrans.commit();
+        TranslationFragment fragment = initTranslationFragment();
+        initViews();
 
         TranslateAdapter retrofit = TranslateAdapter.getInstance();
 
         RxTextView.textChanges(mTextInput)
-                .filter(t -> {
-                    Log.d("STRING", t.toString());
-                    return t.length() != 0;
-                })
+//                .filter(t -> {
+//                    Log.d("STRING", t.toString());
+//                    return t.length() != 0;
+//                })
                 .debounce(delayTime, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .subscribe(s -> retrofit.getDirection(s.toString())
@@ -84,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
                                     secondaryLanguage = sharedPreferences.getString(getString(R.string.secondary_lang), "en");
                                     String result = j.get("lang").getAsString();
                                     if (result.equals(mainLanguage)) {
-                                        Log.d("TAG", secondaryLanguage + mainLanguage);
                                         return retrofit.getTranslate(s.toString(), mainLanguage + "-" + secondaryLanguage);
                                     } else {
                                         return retrofit.getTranslate(s.toString(), result + "-" + mainLanguage);
@@ -143,6 +120,36 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void initViews() {
+        mTextInput = (EditText) findViewById(R.id.text_input);
+        mSpeechButton = (ImageButton) findViewById(R.id.button_speech_to_text);
+
+        mSpeechButton.setOnClickListener(v -> {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, sharedPreferences.getString(getString(R.string.main_lang), "ru"));
+            try {
+                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(0xFFFFFFFF);
+        setSupportActionBar(toolbar);
+    }
+
+    private TranslationFragment initTranslationFragment() {
+        fManager = getFragmentManager();
+        TranslationFragment fragment = TranslationFragment
+                .newInstance("");
+        FragmentTransaction fTrans = fManager.beginTransaction();
+        fTrans.add(R.id.translate_fragment_container, fragment);
+        fTrans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fTrans.commit();
+        return fragment;
     }
 
 }
