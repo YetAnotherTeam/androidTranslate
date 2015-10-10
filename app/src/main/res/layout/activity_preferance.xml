@@ -1,28 +1,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pref_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/pref_layout"
-    tools:context="ru.bondar.russify.PreferenceActivity"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    tools:context="ru.bondar.russify.PreferenceActivity">
 
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/pref_toolbar"
             android:layout_width="match_parent"
-            android:background="@color/primary"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary" />
     </android.support.design.widget.AppBarLayout>
-
 
 
     <FrameLayout
         android:id="@+id/pref_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

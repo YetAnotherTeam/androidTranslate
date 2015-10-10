@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Russify.iml" filepath="$PROJECT_DIR$/Russify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/androidTranslate.iml" filepath="$PROJECT_DIR$/androidTranslate.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

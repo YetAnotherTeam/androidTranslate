@@ -21,6 +21,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -50,11 +51,8 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
         TranslateAdapter retrofit = TranslateAdapter.getInstance();
 
         RxTextView.textChanges(mTextInput)
-//                .filter(t -> {
-//                    Log.d("STRING", t.toString());
-//                    return t.length() != 0;
-//                })
                 .debounce(delayTime, TimeUnit.MILLISECONDS)
+                .filter(t -> t.length() != 0)
                 .observeOn(Schedulers.io())
                 .subscribe(s -> retrofit.getDirection(s.toString())
                                 .flatMap(j -> {
@@ -76,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements TranslationFragme
 
                                     @Override
                                     public void onError(Throwable e) {
+                                        Log.d("STRING", "Error here");
                                         e.printStackTrace();
                                     }
 

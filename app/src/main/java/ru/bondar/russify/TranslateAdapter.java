@@ -11,7 +11,7 @@ import rx.Observable;
 
 public class TranslateAdapter {
     private static TranslateAdapter instance;
-    private TranslateAPI service;
+    private final TranslateAPI service;
     private final String SERVICE_ENDPOINT = "https://translate.yandex.net";
     private final String ACCESS_KEY = "trnsl.1.1.20150911T085342Z.79f8b7b676e2face.b1fca036ecb27cb8260a55bf9704ff61a0e006b9";
 
